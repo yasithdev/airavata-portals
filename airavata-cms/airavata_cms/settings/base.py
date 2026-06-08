@@ -163,6 +163,10 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 WAGTAIL_SITE_NAME = "airavata_cms"
 
+# Fallback title shown by the {% gateway_title %} tag when no GatewayTitle
+# snippet has been authored.
+PORTAL_TITLE = "Apache Airavata"
+
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
 WAGTAILSEARCH_BACKENDS = {
