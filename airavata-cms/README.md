@@ -21,8 +21,14 @@ pip install -r requirements.txt
 export DJANGO_SETTINGS_MODULE=airavata_cms.settings.dev
 python manage.py migrate
 python manage.py createsuperuser
+python manage.py load_cms_data seagrid  # optional: seed a gateway theme + content
 python manage.py runserver            # CMS admin at /admin, pages at /
 ```
+
+`load_cms_data <name>` seeds the theme (CustomCss), chrome snippets (Navbar,
+FooterText, Announcements, CustomHeaderLinks), images, and the home page content
+from a legacy Airavata portal CMS fixture under `home/fixtures/`. The `seagrid`
+seed is included; the import is idempotent.
 
 ## Layout
 
