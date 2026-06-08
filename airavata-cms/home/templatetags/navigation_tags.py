@@ -1,6 +1,5 @@
 from django import template
-from django.conf import settings
-from wagtail.models import Page, Site
+from wagtail.models import Site
 
 from home.models import (
     Announcements,
@@ -9,7 +8,6 @@ from home.models import (
     ExtraWebResources,
     FooterText,
     GatewayIcon,
-    GatewayTitle,
     Navbar,
     NavExtra
 )
@@ -31,16 +29,6 @@ def has_menu_children(page):
     # get_children is a Treebeard API thing
     # https://tabo.pe/projects/django-treebeard/docs/4.0.1/api.html
     return page.get_children().live().in_menu().exists()
-
-
-def has_children(page):
-    # Generically allow index pages to list their children
-    return page.get_children().live().exists()
-
-
-def is_active(page, current_page):
-    # To give us active state on main navigation
-    return (current_page.url.startswith(page.url) if current_page else False)
 
 
 # Retrieves the top menu items - the immediate children of the parent page
@@ -81,21 +69,6 @@ def top_menu_children(context, parent, calling_page=None):
         'parent': parent,
         'menuitems_children': menuitems_children,
         # required by the pageurl tag that we want to use within this template
-        'request': context['request'],
-    }
-
-
-@register.inclusion_tag('tags/breadcrumbs.html', takes_context=True)
-def breadcrumbs(context):
-    self = context.get('self')
-    if self is None or self.depth <= 2:
-        # When on the home page, displaying breadcrumbs is irrelevant.
-        ancestors = ()
-    else:
-        ancestors = Page.objects.ancestor_of(
-            self, inclusive=True).filter(depth__gt=1)
-    return {
-        'ancestors': ancestors,
         'request': context['request'],
     }
 
@@ -165,44 +138,6 @@ def get_nav_extra(context):
     return {
         'navextra': nav_extra,
         'request': context['request'],
-    }
-
-
-@register.inclusion_tag(
-    'home/includes/main_menu_navs.html', takes_context=True)
-def main_menu_navs(context):
-    """NavExtra nav items that are 'include_in_main_menu' == yes"""
-    nav_items = []
-    if NavExtra.objects.first() is not None:
-        nav_extra = NavExtra.objects.first()
-        # only return the nav_items that have 'include_in_main_menu' == yes
-        if nav_extra.nav and len(nav_extra.nav) > 0:
-            nav = nav_extra.nav[0]
-            nav_items = nav.value['nav_items']
-            nav_items = filter(lambda n: n.value['include_in_main_menu'] == 'yes', nav_items)
-
-    return {
-        'nav_items': nav_items,
-        'request': context['request'],
-    }
-
-
-@register.inclusion_tag('home/includes/gateway_icon.html', takes_context=True)
-def gateway_icon(context):
-    gateway_icon = GatewayIcon.objects.first()
-
-    return {
-        'gateway_icon': gateway_icon
-    }
-
-
-@register.inclusion_tag('home/includes/gateway_title.html', takes_context=True)
-def gateway_title(context):
-    gateway_title = GatewayTitle.objects.first()
-
-    return {
-        'gateway_title': gateway_title,
-        'default_title': getattr(settings, 'PORTAL_TITLE', ''),
     }
 
 
